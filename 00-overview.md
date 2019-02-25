@@ -5,7 +5,7 @@ This document describes the general structure of the Tor codebase, how
 it fits together, what functionality is available for extending Tor,
 and gives some notes on how Tor got that way.
 
-Tor remains a work in progress: We've been working on it for more than a
+Tor remains a work in progress: we've been working on it for more than a
 decade, and we've learned a lot about good coding since we first
 started.  This means, however, that some of the older pieces of Tor will
 have some "code smell" in them that could sure stand a brisk
@@ -42,7 +42,7 @@ compress and uncompress directory information).
 
 Most of Tor's work today is done in a single event-driven main thread.
 Tor also spawns one or more worker threads to handle CPU-intensive
-tasks.  (Right now, this only includes circuit encryption.)
+tasks (right now, this only includes circuit encryption).
 
 On startup, Tor initializes its libraries, reads and responds to its
 configuration files, and launches a main event loop.  At first, the only
@@ -54,11 +54,13 @@ will open, and new events will be scheduled.
 
 The codebase is divided into a few main subdirectories:
 
-   src/common -- utility functions, not necessarily tor-specific.
+   src/lib -- utility functions, not necessarily tor-specific.
 
-   src/or -- implements the Tor protocols.
+   src/core/or -- implements the Tor protocols.
 
-   src/test -- unit and regression tests
+   src/test -- unit and regression tests.
+
+   src/config -- the configuration files that ship with Tor.
 
    src/ext -- Code maintained elsewhere that we include in the Tor
    source distribution.
@@ -66,18 +68,20 @@ The codebase is divided into a few main subdirectories:
    src/trunnel -- automatically generated code (from the Trunnel)
    tool: used to parse and encode binary formats.
 
+   src/rust  -- rust in Tor.
+
 ### Some key high-level abstractions ###
 
 The most important abstractions at Tor's high-level are Connections,
 Channels, Circuits, and Nodes.
 
 A 'Connection' represents a stream-based information flow.  Most
-connections are TCP connections to remote Tor servers and clients. (But
+connections are TCP connections to remote Tor servers and clients (but,
 as a shortcut, a relay will sometimes make a connection to itself
-without actually using a TCP connection.  More details later on.)
+without actually using a TCP connection.  More details later on).
 Connections exist in different varieties, depending on what
 functionality they provide.  The principle types of connection are
-"edge" (eg a socks connection or a connection from an exit relay to a
+"edge" (e.g. a socks connection or a connection from an exit relay to a
 destination), "OR" (a TLS stream connecting to a relay), "Directory" (an
 HTTP connection to learn about the network), and "Control" (a connection
 from a controller).
